@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Subscription Success - Netflix Clone{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-black text-white">
+    <div class="container mx-auto px-4 py-16">
+        <div class="max-w-2xl mx-auto text-center">
+            <!-- Success Icon -->
+            <div class="mb-8">
+                <div class="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mx-auto">
+                    <svg class="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                    </svg>
+                </div>
+            </div>
+
+            <!-- Success Message -->
+            <h1 class="text-4xl font-bold mb-4">
+                {% if test_mode %}
+                    Test Subscription Activated!
+                {% else %}
+                    Welcome to Netflix Clone!
+                {% endif %}
+            </h1>
+            
+            <p class="text-xl text-gray-300 mb-8">
+                {% if test_mode %}
+                    Your test subscription to <strong>{{ plan.display_name }}</strong> has been activated for development purposes.
+                {% else %}
+                    Your subscription to <strong>{{ plan.display_name }}</strong> has been successfully activated.
+                {% endif %}
+            </p>
+
+            {% if test_mode %}
+                <div class="bg-yellow-600 bg-opacity-20 border border-yellow-500 rounded-lg p-4 mb-8">
+                    <p class="text-yellow-200">
+                        <strong>Test Mode:</strong> This is a simulated subscription for development purposes. 
+                        No actual payment was processed.
+                    </p>
+                </div>
+            {% endif %}
+
+            <!-- Subscription Details -->
+            <div class="bg-gray-900 rounded-lg p-6 mb-8 text-left">
+                <h2 class="text-xl font-semibold mb-4">Subscription Details</h2>
+                <div class="space-y-2">
+                    <div class="flex justify-between">
+                        <span class="text-gray-400">Plan:</span>
+                        <span>{{ plan.display_name }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-400">Price:</span>
+                        <span>${{ plan.price }}/month</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-400">Status:</span>
+                        <span class="text-green-400 capitalize">{{ subscription.status }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-400">Current Period:</span>
+                        <span>{{ subscription.current_period_start|date:"M d, Y" }} - {{ subscription.current_period_end|date:"M d, Y" }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Benefits -->
+            <div class="bg-gray-900 rounded-lg p-6 mb-8 text-left">
+                <h2 class="text-xl font-semibold mb-4">Your Benefits</h2>
+                <ul class="space-y-2 text-gray-300">
+                    {% if plan.name == 'basic' %}
+                        <li class="flex items-center">
+                            <svg class="w-5 h-5 text-green-400 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                            </svg>
+                            Watch on 1 screen at a time
+                        </li>
+                        <li class="flex items-center">
+                            <svg class="w-5 h-5 text-green-400 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                            </svg>
+                            Good video quality
+                        </li>
+                    {% elif plan.name == 'standard' %}
+                        <li class="flex items-center">
+                            <svg class="w-5 h-5 text-green-400 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                            </svg>
+                            Watch on 2 screens at a time
+                        </li>
+                        <li class="flex items-center">
+                            <svg class="w-5 h-5 text-green-400 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                            </svg>
+                            Better video quality (HD)
+                        </li>
+                    {% elif plan.name == 'premium' %}
+                        <li class="flex items-center">
+                            <svg class="w-5 h-5 text-green-400 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                            </svg>
+                            Watch on 4 screens at a time
+                        </li>
+                        <li class="flex items-center">
+                            <svg class="w-5 h-5 text-green-400 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                            </svg>
+                            Best video quality (4K + HDR)
+                        </li>
+                    {% endif %}
+                    <li class="flex items-center">
+                        <svg class="w-5 h-5 text-green-400 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                        </svg>
+                        Cancel anytime
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="{% url 'web:home' %}" class="bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-8 rounded transition duration-200">
+                    Start Watching
+                </a>
+                <a href="{% url 'users:subscription_manage' %}" class="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-3 px-8 rounded transition duration-200">
+                    Manage Subscription
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

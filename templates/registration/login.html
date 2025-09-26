@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% block title %}Sign In - Netflix Clone{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-black flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md w-full space-y-8">
+        <div>
+            <div class="mx-auto h-12 w-auto flex justify-center">
+                <h1 class="text-netflix-red text-4xl font-bold">NETFLIX</h1>
+            </div>
+            <h2 class="mt-6 text-center text-3xl font-extrabold text-white">
+                Sign in to your account
+            </h2>
+            <p class="mt-2 text-center text-sm text-gray-400">
+                Welcome back! Enter your credentials to continue watching.
+            </p>
+        </div>
+        
+        <form class="mt-8 space-y-6" method="post">
+            {% csrf_token %}
+            
+            <!-- Error Messages -->
+            {% if form.errors %}
+            <div class="bg-red-500 text-white p-4 rounded-md">
+                {% for field, errors in form.errors.items %}
+                    {% for error in errors %}
+                        <p class="text-sm">{{ error }}</p>
+                    {% endfor %}
+                {% endfor %}
+            </div>
+            {% endif %}
+            
+            <div class="rounded-md shadow-sm space-y-4">
+                <div>
+                    <label for="{{ form.username.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-1">
+                        Username or Email
+                    </label>
+                    <input type="text" 
+                           name="{{ form.username.name }}" 
+                           id="{{ form.username.id_for_label }}" 
+                           required 
+                           class="appearance-none relative block w-full px-3 py-3 border border-gray-600 placeholder-gray-500 text-white bg-gray-800 rounded-md focus:outline-none focus:ring-netflix-red focus:border-netflix-red focus:z-10 sm:text-sm" 
+                           placeholder="Enter your username or email"
+                           value="{{ form.username.value|default:'' }}">
+                </div>
+                
+                <div>
+                    <label for="{{ form.password.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-1">
+                        Password
+                    </label>
+                    <input type="password" 
+                           name="{{ form.password.name }}" 
+                           id="{{ form.password.id_for_label }}" 
+                           required 
+                           class="appearance-none relative block w-full px-3 py-3 border border-gray-600 placeholder-gray-500 text-white bg-gray-800 rounded-md focus:outline-none focus:ring-netflix-red focus:border-netflix-red focus:z-10 sm:text-sm" 
+                           placeholder="Enter your password">
+                </div>
+            </div>
+
+            <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                    <input id="remember_me" 
+                           name="remember" 
+                           type="checkbox" 
+                           class="h-4 w-4 text-netflix-red focus:ring-netflix-red border-gray-600 bg-gray-800 rounded">
+                    <label for="remember_me" class="ml-2 block text-sm text-gray-300">
+                        Remember me
+                    </label>
+                </div>
+
+                <div class="text-sm">
+                    <a href="{% url 'password_reset' %}" class="font-medium text-netflix-red hover:text-red-400">
+                        Forgot your password?
+                    </a>
+                </div>
+            </div>
+
+            <div>
+                <button type="submit" class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-netflix-red hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-netflix-red transition duration-150 ease-in-out">
+                    <span class="absolute left-0 inset-y-0 flex items-center pl-3">
+                        <svg class="h-5 w-5 text-red-300 group-hover:text-red-200" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                            <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
+                        </svg>
+                    </span>
+                    Sign in
+                </button>
+            </div>
+        </form>
+        
+        <div class="text-center">
+            <p class="text-gray-400 text-sm">
+                New to Netflix Clone?
+                <a href="{% url 'register' %}" class="font-medium text-netflix-red hover:text-red-400">
+                    Sign up now
+                </a>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

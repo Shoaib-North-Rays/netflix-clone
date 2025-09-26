@@ -1,0 +1,227 @@
+{% extends 'base.html' %}
+
+{% block title %}Watch {{ movie.title }} - Netflix Clone{% endblock %}
+
+{% block navbar %}{% endblock %}
+
+{% block footer %}{% endblock %}
+
+{% block content %}
+<div class="bg-black min-h-screen relative">
+    
+    <!-- Video Player Section -->
+    <div class="relative">
+        <!-- Video Container -->
+        <div class="relative bg-black">
+            <video id="video-player" 
+                   class="w-full h-screen object-contain" 
+                   controls
+                   autoplay
+                   poster="{% if movie.thumbnail %}{{ movie.thumbnail.url }}{% endif %}">
+                
+                <!-- Video Sources -->
+                {% for video in video_files %}
+                <source src="{{ video.file_path.url }}" type="video/mp4" data-quality="{{ video.quality }}">
+                {% endfor %}
+                
+                <!-- Fallback -->
+                <p class="text-white text-center py-20">
+                    Your browser does not support the video tag. 
+                    <a href="{% url 'web:movie_detail' movie.slug %}" class="text-netflix-red underline">Go back to movie details</a>
+                </p>
+            </video>
+            
+            <!-- Top Controls Overlay (Back and Settings) -->
+            <div id="top-controls" class="absolute top-0 left-0 right-0 p-6 bg-gradient-to-b from-black/70 to-transparent z-10">
+                <div class="flex items-center justify-between">
+                    <!-- Back Button -->
+                    <button onclick="goBack()" class="text-white hover:text-gray-300 transition hover:scale-110">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                        </svg>
+                    </button>
+                    
+                    <!-- Movie Title -->
+                    <div class="text-center">
+                        <h1 class="text-white text-xl font-semibold">{{ movie.title }}</h1>
+                        <p class="text-gray-300 text-sm">{{ movie.release_year }} • {{ movie.duration_formatted }}</p>
+                    </div>
+                    
+                    <!-- Settings Button -->
+                    <button onclick="toggleSettings()" class="text-white hover:text-gray-300 transition hover:scale-110">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Loading Spinner -->
+    <div id="loading-spinner" class="absolute inset-0 flex items-center justify-center bg-black/50 hidden">
+        <div class="animate-spin rounded-full h-32 w-32 border-b-2 border-netflix-red"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Hide the top controls initially, show on hover */
+    #top-controls {
+        opacity: 1;
+        transition: opacity 0.3s ease;
+    }
+    
+    #top-controls.fade-out {
+        opacity: 0;
+    }
+    
+    /* Custom video controls styling */
+    video::-webkit-media-controls-panel {
+        background-color: rgba(0, 0, 0, 0.8);
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const video = document.getElementById('video-player');
+const topControls = document.getElementById('top-controls');
+
+// Auto-hide top controls
+let controlsTimeout;
+
+function showTopControls() {
+    topControls.classList.remove('fade-out');
+    clearTimeout(controlsTimeout);
+    controlsTimeout = setTimeout(hideTopControls, 3000);
+}
+
+function hideTopControls() {
+    if (!video.paused) {
+        topControls.classList.add('fade-out');
+    }
+}
+
+// Show controls on mouse move
+video.addEventListener('mousemove', showTopControls);
+document.addEventListener('mousemove', showTopControls);
+
+// Keep controls visible when video is paused
+video.addEventListener('pause', function() {
+    showTopControls();
+    clearTimeout(controlsTimeout);
+});
+
+video.addEventListener('play', function() {
+    showTopControls();
+});
+
+// Back button
+function goBack() {
+    if (window.history.length > 1) {
+        window.history.back();
+    } else {
+        window.location.href = "{% url 'web:movie_detail' movie.slug %}";
+    }
+}
+
+// Settings menu
+function toggleSettings() {
+    const existingMenu = document.getElementById('settings-menu');
+    if (existingMenu) {
+        existingMenu.remove();
+        return;
+    }
+    
+    const menu = document.createElement('div');
+    menu.id = 'settings-menu';
+    menu.className = 'fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50';
+    menu.innerHTML = `
+        <div class="bg-gray-800 rounded-lg p-6 max-w-md w-full mx-4">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-white text-lg font-semibold">Player Settings</h3>
+                <button onclick="toggleSettings()" class="text-gray-400 hover:text-white">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <div class="space-y-4 text-white">
+                <div>
+                    <label class="block text-sm font-medium mb-2">Playback Speed</label>
+                    <select onchange="changePlaybackSpeed(this.value)" class="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2">
+                        <option value="0.5">0.5x</option>
+                        <option value="0.75">0.75x</option>
+                        <option value="1" selected>1x (Normal)</option>
+                        <option value="1.25">1.25x</option>
+                        <option value="1.5">1.5x</option>
+                        <option value="2">2x</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2">Video Quality</label>
+                    <p class="text-gray-400 text-sm">
+                        {% for video in video_files %}
+                            {{ video.quality }}{% if not forloop.last %}, {% endif %}
+                        {% endfor %}
+                    </p>
+                </div>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(menu);
+}
+
+function changePlaybackSpeed(speed) {
+    video.playbackRate = parseFloat(speed);
+}
+
+// Keyboard shortcuts
+document.addEventListener('keydown', function(e) {
+    switch(e.code) {
+        case 'Space':
+            e.preventDefault();
+            if (video.paused) {
+                video.play();
+            } else {
+                video.pause();
+            }
+            break;
+        case 'KeyF':
+            e.preventDefault();
+            if (!document.fullscreenElement) {
+                video.requestFullscreen();
+            } else {
+                document.exitFullscreen();
+            }
+            break;
+        case 'KeyM':
+            e.preventDefault();
+            video.muted = !video.muted;
+            break;
+        case 'ArrowLeft':
+            e.preventDefault();
+            video.currentTime -= 10;
+            break;
+        case 'ArrowRight':
+            e.preventDefault();
+            video.currentTime += 10;
+            break;
+        case 'ArrowUp':
+            e.preventDefault();
+            video.volume = Math.min(video.volume + 0.1, 1);
+            break;
+        case 'ArrowDown':
+            e.preventDefault();
+            video.volume = Math.max(video.volume - 0.1, 0);
+            break;
+    }
+});
+
+// Initialize
+showTopControls();
+</script>
+{% endblock %}

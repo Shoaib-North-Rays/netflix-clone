@@ -1,0 +1,278 @@
+{% extends 'base.html' %}
+
+{% block title %}Pricing - Netflix Clone{% endblock %}
+
+{% block content %}
+<div class="pt-16 bg-black min-h-screen">
+    
+    <!-- Hero Section -->
+    <section class="bg-gradient-to-b from-netflix-gray to-black py-20">
+        <div class="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
+            <h1 class="text-4xl md:text-5xl font-bold text-white mb-6">
+                Choose the plan that's right for you
+            </h1>
+            <p class="text-xl text-gray-300 mb-8">
+                Join millions of people discovering new favorites and watching what's popular.
+            </p>
+            <div class="flex items-center justify-center space-x-6 text-white">
+                <div class="flex items-center">
+                    <svg class="w-6 h-6 text-netflix-red mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                    </svg>
+                    Watch anywhere
+                </div>
+                <div class="flex items-center">
+                    <svg class="w-6 h-6 text-netflix-red mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                    </svg>
+                    Cancel anytime
+                </div>
+                <div class="flex items-center">
+                    <svg class="w-6 h-6 text-netflix-red mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                    </svg>
+                    Unlimited movies
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Pricing Plans -->
+    <section class="py-16 bg-black">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            
+            {% if plans %}
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                {% for plan in plans %}
+                <div class="relative bg-gray-900 rounded-2xl p-8 {% if plan.name == 'basic' %}border-2 border-netflix-red transform scale-105{% else %}border border-gray-700{% endif %} hover:border-netflix-red transition-all duration-300">
+                    
+                    {% if plan.name == 'basic' %}
+                    <div class="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                        <span class="bg-netflix-red text-white px-4 py-1 rounded-full text-sm font-semibold">Most Popular</span>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Plan Header -->
+                    <div class="text-center mb-8">
+                        <h3 class="text-2xl font-bold text-white mb-2">{{ plan.display_name }}</h3>
+                        <div class="text-4xl font-bold text-white mb-2">
+                            {% if plan.price == 0 %}
+                            <span class="text-green-500">Free</span>
+                            {% else %}
+                            <span>${{ plan.price }}</span>
+                            <span class="text-lg text-gray-400 font-normal">/month</span>
+                            {% endif %}
+                        </div>
+                        <p class="text-gray-400">{{ plan.description|default:"Perfect for getting started" }}</p>
+                    </div>
+                    
+                    <!-- Plan Features -->
+                    <div class="space-y-4 mb-8">
+                        <div class="flex items-center">
+                            <svg class="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span class="text-white">{{ plan.max_streams }} simultaneous stream{{ plan.max_streams|pluralize }}</span>
+                        </div>
+                        
+                        <div class="flex items-center">
+                            {% if plan.hd_quality %}
+                            <svg class="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span class="text-white">HD Quality</span>
+                            {% else %}
+                            <svg class="w-5 h-5 text-gray-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span class="text-gray-500">HD Quality</span>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="flex items-center">
+                            {% if plan.ultra_hd_quality %}
+                            <svg class="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span class="text-white">Ultra HD</span>
+                            {% else %}
+                            <svg class="w-5 h-5 text-gray-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span class="text-gray-500">Ultra HD</span>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="flex items-center">
+                            {% if plan.download_allowed %}
+                            <svg class="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span class="text-white">Downloads</span>
+                            {% else %}
+                            <svg class="w-5 h-5 text-gray-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span class="text-gray-500">Downloads</span>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="flex items-center">
+                            <svg class="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span class="text-white">Cancel anytime</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Action Button -->
+                    {% if user.is_authenticated %}
+                    <button onclick="selectPlan('{{ plan.id }}', '{{ plan.display_name }}', {{ plan.price }})" 
+                            class="w-full py-3 px-4 rounded-lg font-semibold transition duration-200 
+                            {% if plan.name == 'basic' %}bg-netflix-red text-white hover:bg-red-700{% else %}bg-gray-700 text-white hover:bg-gray-600{% endif %}">
+                        {% if plan.price == 0 %}Start Free{% else %}Choose Plan{% endif %}
+                    </button>
+                    {% else %}
+                    <a href="{% url 'account_signup' %}" 
+                       class="block w-full py-3 px-4 rounded-lg font-semibold text-center transition duration-200 
+                       {% if plan.name == 'basic' %}bg-netflix-red text-white hover:bg-red-700{% else %}bg-gray-700 text-white hover:bg-gray-600{% endif %}">
+                        {% if plan.price == 0 %}Start Free{% else %}Get Started{% endif %}
+                    </a>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <!-- No Plans Available -->
+            <div class="text-center py-20">
+                <h3 class="text-2xl text-gray-400 mb-4">No subscription plans available</h3>
+                <p class="text-gray-500">Please contact support for assistance.</p>
+            </div>
+            {% endif %}
+        </div>
+    </section>
+    
+    <!-- FAQ Section -->
+    <section class="py-16 bg-netflix-gray">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-3xl font-bold text-white text-center mb-12">Frequently Asked Questions</h2>
+            
+            <div class="space-y-4">
+                <div class="bg-gray-800 rounded-lg">
+                    <button class="w-full px-6 py-4 text-left text-white hover:bg-gray-700 transition duration-200 flex justify-between items-center" onclick="toggleFAQ(1)">
+                        <span class="text-lg font-medium">What can I watch on Netflix?</span>
+                        <svg class="w-6 h-6 transform transition-transform duration-200" id="faq-icon-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </button>
+                    <div class="hidden px-6 pb-4 text-gray-300" id="faq-content-1">
+                        Netflix has an extensive library of feature films, documentaries, TV shows, anime, award-winning Netflix originals, and more. Watch as much as you want, anytime you want.
+                    </div>
+                </div>
+                
+                <div class="bg-gray-800 rounded-lg">
+                    <button class="w-full px-6 py-4 text-left text-white hover:bg-gray-700 transition duration-200 flex justify-between items-center" onclick="toggleFAQ(2)">
+                        <span class="text-lg font-medium">How much does Netflix cost?</span>
+                        <svg class="w-6 h-6 transform transition-transform duration-200" id="faq-icon-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </button>
+                    <div class="hidden px-6 pb-4 text-gray-300" id="faq-content-2">
+                        Watch Netflix on your smartphone, tablet, Smart TV, laptop, or streaming device, all for one fixed monthly fee. Plans range from $8.99 to $17.99 a month. No extra costs, no contracts.
+                    </div>
+                </div>
+                
+                <div class="bg-gray-800 rounded-lg">
+                    <button class="w-full px-6 py-4 text-left text-white hover:bg-gray-700 transition duration-200 flex justify-between items-center" onclick="toggleFAQ(3)">
+                        <span class="text-lg font-medium">Where can I watch?</span>
+                        <svg class="w-6 h-6 transform transition-transform duration-200" id="faq-icon-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </button>
+                    <div class="hidden px-6 pb-4 text-gray-300" id="faq-content-3">
+                        Watch anywhere, anytime. Sign in with your Netflix account to watch instantly on the web at netflix.com from your personal computer or on any internet-connected device that offers the Netflix app.
+                    </div>
+                </div>
+                
+                <div class="bg-gray-800 rounded-lg">
+                    <button class="w-full px-6 py-4 text-left text-white hover:bg-gray-700 transition duration-200 flex justify-between items-center" onclick="toggleFAQ(4)">
+                        <span class="text-lg font-medium">How do I cancel?</span>
+                        <svg class="w-6 h-6 transform transition-transform duration-200" id="faq-icon-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </button>
+                    <div class="hidden px-6 pb-4 text-gray-300" id="faq-content-4">
+                        Netflix is flexible. There are no pesky contracts and no commitments. You can easily cancel your account online in two clicks. There are no cancellation fees – start or stop your account anytime.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<!-- Plan Selection Modal -->
+<div id="plan-modal" class="fixed inset-0 bg-black bg-opacity-75 hidden z-50 flex items-center justify-center">
+    <div class="bg-gray-900 p-8 rounded-lg max-w-md w-full mx-4">
+        <h3 class="text-white text-2xl font-bold mb-4">Confirm Your Plan</h3>
+        <p class="text-gray-300 mb-6">You've selected the <span id="selected-plan-name" class="text-netflix-red font-semibold"></span> plan.</p>
+        
+        <div class="mb-6">
+            <div class="flex justify-between items-center text-white">
+                <span>Monthly Cost:</span>
+                <span id="selected-plan-price" class="text-xl font-bold"></span>
+            </div>
+        </div>
+        
+        <div class="flex space-x-4">
+            <button onclick="closeModal()" class="flex-1 py-3 px-4 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition">
+                Cancel
+            </button>
+            <button onclick="processPlan()" class="flex-1 py-3 px-4 bg-netflix-red text-white rounded-lg hover:bg-red-700 transition">
+                Subscribe
+            </button>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let selectedPlanId = null;
+
+function selectPlan(planId, planName, planPrice) {
+    selectedPlanId = planId;
+    document.getElementById('selected-plan-name').textContent = planName;
+    document.getElementById('selected-plan-price').textContent = planPrice == 0 ? 'Free' : `$${planPrice}/month`;
+    document.getElementById('plan-modal').classList.remove('hidden');
+}
+
+function closeModal() {
+    document.getElementById('plan-modal').classList.add('hidden');
+    selectedPlanId = null;
+}
+
+function processPlan() {
+    if (selectedPlanId) {
+        // Here you would typically integrate with your payment system
+        alert('Payment integration would go here. Plan ID: ' + selectedPlanId);
+        closeModal();
+    }
+}
+
+function toggleFAQ(faqNumber) {
+    const content = document.getElementById(`faq-content-${faqNumber}`);
+    const icon = document.getElementById(`faq-icon-${faqNumber}`);
+    
+    content.classList.toggle('hidden');
+    icon.classList.toggle('rotate-180');
+}
+
+// Close modal when clicking outside
+document.getElementById('plan-modal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeModal();
+    }
+});
+</script>
+{% endblock %}

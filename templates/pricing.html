@@ -1,0 +1,195 @@
+{% extends 'base.html' %}
+
+{% block title %}Choose Your Plan - Netflix Clone{% endblock %}
+
+{% block content %}
+<div class="pt-16 bg-black min-h-screen">
+    <!-- Main Content -->
+    <main class="py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Header Section -->
+            <div class="text-center mb-16">
+                <h1 class="text-4xl md:text-6xl font-bold text-white mb-6">Choose the plan that's right for you</h1>
+                <p class="text-xl text-gray-300 mb-12">Watch all you want. Cancel anytime.</p>
+                <div class="flex flex-col md:flex-row justify-center items-center gap-8 md:gap-12">
+                    <div class="flex items-center text-white">
+                        <svg class="w-6 h-6 text-netflix-red mr-3" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                        </svg>
+                        <span>Unlimited movies, TV shows and more</span>
+                    </div>
+                    <div class="flex items-center text-white">
+                        <svg class="w-6 h-6 text-netflix-red mr-3" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                        </svg>
+                        <span>Watch anywhere. Cancel anytime</span>
+                    </div>
+                    <div class="flex items-center text-white">
+                        <svg class="w-6 h-6 text-netflix-red mr-3" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                        </svg>
+                        <span>No commitments, cancel anytime</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Plans Section -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-20">
+                {% for plan in plans %}
+                <div class="relative bg-gray-900 rounded-xl p-8 border-2 border-transparent hover:border-netflix-red transition-all duration-300 hover:transform hover:scale-105 cursor-pointer {% if plan.name == 'standard' %}border-netflix-red bg-gradient-to-b from-gray-900 to-gray-800{% endif %}" data-plan="{{ plan.name }}">
+                    {% if plan.name == 'standard' %}
+                    <div class="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-netflix-red text-white px-6 py-2 rounded-full text-sm font-semibold">
+                        Most Popular
+                    </div>
+                    {% endif %}
+                    <div class="text-center mb-8">
+                        <h3 class="text-2xl font-bold text-white mb-4">{{ plan.display_name }}</h3>
+                        <div class="flex items-baseline justify-center">
+                            <span class="text-lg text-white">$</span>
+                            <span class="text-5xl font-bold text-netflix-red">{{ plan.price }}</span>
+                            <span class="text-lg text-gray-400">/month</span>
+                        </div>
+                    </div>
+                    <div class="space-y-4 mb-8">
+                        <div class="flex justify-between items-center py-3 border-b border-gray-700">
+                            <span class="text-gray-400">Video quality</span>
+                            <span class="text-white font-semibold">
+                                {% if plan.ultra_hd_quality %}Best (4K+HDR)
+                                {% elif plan.hd_quality %}Better (1080p)
+                                {% else %}Good (720p){% endif %}
+                            </span>
+                        </div>
+                        <div class="flex justify-between items-center py-3 border-b border-gray-700">
+                            <span class="text-gray-400">Supported devices</span>
+                            <span class="text-white font-semibold">TV, computer, mobile, tablet</span>
+                        </div>
+                        <div class="flex justify-between items-center py-3 border-b border-gray-700">
+                            <span class="text-gray-400">Simultaneous streams</span>
+                            <span class="text-white font-semibold">{{ plan.max_streams }}</span>
+                        </div>
+                        {% if plan.download_allowed %}
+                        <div class="flex justify-between items-center py-3 border-b border-gray-700">
+                            <span class="text-gray-400">Download allowed</span>
+                            <span class="text-green-400 font-semibold">Yes</span>
+                        </div>
+                        {% endif %}
+                        <div class="flex justify-between items-center py-3">
+                            <span class="text-gray-400">Unlimited content</span>
+                            <span class="text-white font-semibold">Movies & TV shows</span>
+                        </div>
+                    </div>
+                    <button class="w-full bg-netflix-red text-white py-3 px-6 rounded-lg font-semibold hover:bg-red-700 transition duration-300 select-plan" data-plan-id="{{ plan.name }}" data-price="{{ plan.price }}">
+                        Get Started
+                    </button>
+                </div>
+                {% empty %}
+                <div class="col-span-full text-center py-12">
+                    <p class="text-gray-400 text-lg">No subscription plans are currently available. Please check back later.</p>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- FAQ Section -->
+            <div class="max-w-4xl mx-auto">
+                <h2 class="text-3xl font-bold text-white text-center mb-12">Frequently Asked Questions</h2>
+                <div class="space-y-4">
+                    <div class="bg-gray-900 rounded-lg overflow-hidden">
+                        <button class="w-full px-6 py-6 text-left flex justify-between items-center text-white hover:bg-gray-800 transition-colors faq-toggle">
+                            <h3 class="text-lg font-semibold">What can I watch on Netflix Clone?</h3>
+                            <svg class="w-6 h-6 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                            </svg>
+                        </button>
+                        <div class="px-6 pb-6 text-gray-300 hidden faq-answer">
+                            <p>Netflix Clone has an extensive library of feature films, documentaries, TV shows, anime, award-winning originals, and more. Watch as much as you want, anytime you want.</p>
+                        </div>
+                    </div>
+                    <div class="bg-gray-900 rounded-lg overflow-hidden">
+                        <button class="w-full px-6 py-6 text-left flex justify-between items-center text-white hover:bg-gray-800 transition-colors faq-toggle">
+                            <h3 class="text-lg font-semibold">How much does Netflix Clone cost?</h3>
+                            <svg class="w-6 h-6 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                            </svg>
+                        </button>
+                        <div class="px-6 pb-6 text-gray-300 hidden faq-answer">
+                            <p>Watch Netflix Clone on your smartphone, tablet, Smart TV, laptop, or streaming device, all for one fixed monthly fee. Plans start from as low as $8.99 a month. No extra costs, no contracts.</p>
+                        </div>
+                    </div>
+                    <div class="bg-gray-900 rounded-lg overflow-hidden">
+                        <button class="w-full px-6 py-6 text-left flex justify-between items-center text-white hover:bg-gray-800 transition-colors faq-toggle">
+                            <h3 class="text-lg font-semibold">Where can I watch?</h3>
+                            <svg class="w-6 h-6 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                            </svg>
+                        </button>
+                        <div class="px-6 pb-6 text-gray-300 hidden faq-answer">
+                            <p>Watch anywhere, anytime. Sign in with your Netflix Clone account to watch instantly on the web from your personal computer or on any internet-connected device.</p>
+                        </div>
+                    </div>
+                    <div class="bg-gray-900 rounded-lg overflow-hidden">
+                        <button class="w-full px-6 py-6 text-left flex justify-between items-center text-white hover:bg-gray-800 transition-colors faq-toggle">
+                            <h3 class="text-lg font-semibold">How do I cancel?</h3>
+                            <svg class="w-6 h-6 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                            </svg>
+                        </button>
+                        <div class="px-6 pb-6 text-gray-300 hidden faq-answer">
+                            <p>Netflix Clone is flexible. There are no pesky contracts and no commitments. You can easily cancel your account online in two clicks. There are no cancellation fees – start or stop your account anytime.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // FAQ Toggle functionality
+    document.querySelectorAll('.faq-toggle').forEach(button => {
+        button.addEventListener('click', () => {
+            const answer = button.nextElementSibling;
+            const icon = button.querySelector('svg');
+            
+            // Toggle the answer visibility
+            answer.classList.toggle('hidden');
+            
+            // Rotate the icon
+            if (answer.classList.contains('hidden')) {
+                icon.style.transform = 'rotate(0deg)';
+            } else {
+                icon.style.transform = 'rotate(45deg)';
+            }
+        });
+    });
+
+    // Plan selection functionality
+    document.querySelectorAll('.select-plan').forEach(button => {
+        button.addEventListener('click', function() {
+            const planId = this.getAttribute('data-plan-id');
+            const price = this.getAttribute('data-price');
+            
+            {% if user.is_authenticated %}
+                // Redirect to Stripe checkout
+                window.location.href = `/register/checkout/${planId}/`;
+            {% else %}
+                // Redirect to registration with plan pre-selected
+                window.location.href = `/register/?plan=${planId}&price=${price}`;
+            {% endif %}
+        });
+    });
+
+    // Plan card selection highlighting
+    document.querySelectorAll('[data-plan]').forEach(card => {
+        card.addEventListener('click', function() {
+            document.querySelectorAll('[data-plan]').forEach(c => {
+                c.classList.remove('border-netflix-red');
+                c.classList.add('border-transparent');
+            });
+            this.classList.remove('border-transparent');
+            this.classList.add('border-netflix-red');
+        });
+    });
+</script>
+{% endblock %}

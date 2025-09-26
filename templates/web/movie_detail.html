@@ -1,0 +1,332 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ movie.title }} - Netflix Clone{% endblock %}
+
+{% block content %}
+<div class="pt-16">
+    <!-- Hero Section -->
+    <section class="relative h-screen bg-cover bg-center bg-no-repeat" 
+             style="background-image: url('{% if movie.banner_image %}{{ movie.banner_image.url }}{% else %}{{ movie.thumbnail.url }}{% endif %}');">
+        
+        <!-- Gradient Overlay -->
+        <div class="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent"></div>
+        
+        <!-- Content -->
+        <div class="relative z-10 h-full flex items-end">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
+                <div class="max-w-3xl">
+                    
+                    <!-- Movie Info -->
+                    <h1 class="text-4xl md:text-6xl font-bold text-white mb-4">{{ movie.title }}</h1>
+                    
+                    <!-- Meta Information -->
+                    <div class="flex items-center space-x-6 mb-6 text-white">
+                        {% if movie.imdb_rating %}
+                        <span class="bg-yellow-500 text-black px-3 py-1 rounded font-semibold">
+                            ⭐ {{ movie.imdb_rating }}
+                        </span>
+                        {% endif %}
+                        <span class="text-lg">{{ movie.release_year }}</span>
+                        <span class="bg-gray-600 px-2 py-1 rounded text-sm">{{ movie.rating }}</span>
+                        <span class="text-lg">{{ movie.duration_formatted }}</span>
+                        <span class="text-lg">{{ movie.view_count }} views</span>
+                    </div>
+                    
+                    <!-- Description -->
+                    <p class="text-lg text-gray-300 mb-8 leading-relaxed">{{ movie.description }}</p>
+                    
+                    <!-- Genres -->
+                    <div class="flex flex-wrap gap-2 mb-8">
+                        {% for genre in movie.genres.all %}
+                        <span class="bg-gray-700 text-white px-3 py-1 rounded-full text-sm">{{ genre.name }}</span>
+                        {% endfor %}
+                    </div>
+                    
+                    <!-- Action Buttons -->
+                    <div class="flex items-center space-x-4">
+                        {% if user.is_authenticated %}
+                            {% if can_watch %}
+                            <a href="{% url 'web:watch_movie' movie.slug %}" 
+                               class="bg-white text-black px-8 py-3 rounded font-semibold hover:bg-gray-200 transition flex items-center text-lg">
+                                <svg class="w-6 h-6 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path>
+                                </svg>
+                                Play
+                            </a>
+                            {% else %}
+                            <a href="{% url 'web:pricing' %}" 
+                               class="bg-netflix-red text-white px-8 py-3 rounded font-semibold hover:bg-red-700 transition flex items-center text-lg">
+                                <svg class="w-6 h-6 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path>
+                                </svg>
+                                Subscribe to Watch
+                            </a>
+                            {% endif %}
+                            
+                            <!-- Watchlist Button -->
+                            <button onclick="toggleWatchlist({{ movie.id }})" 
+                                    id="watchlist-btn" 
+                                    class="bg-gray-600 bg-opacity-70 text-white px-8 py-3 rounded font-semibold hover:bg-opacity-90 transition flex items-center text-lg">
+                                <svg class="w-6 h-6 mr-2" fill="{% if in_watchlist %}currentColor{% else %}none{% endif %}" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                </svg>
+                                <span id="watchlist-text">{% if in_watchlist %}Remove from List{% else %}Add to List{% endif %}</span>
+                            </button>
+                        {% else %}
+                            <a href="{% url 'account_login' %}" 
+                               class="bg-white text-black px-8 py-3 rounded font-semibold hover:bg-gray-200 transition flex items-center text-lg">
+                                <svg class="w-6 h-6 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path>
+                                </svg>
+                                Sign In to Watch
+                            </a>
+                        {% endif %}
+                        
+                        <!-- Trailer Button -->
+                        {% if movie.trailer_url %}
+                        <button onclick="openTrailer()" 
+                                class="bg-gray-600 bg-opacity-70 text-white px-6 py-3 rounded font-semibold hover:bg-opacity-90 transition flex items-center text-lg">
+                            <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            Trailer
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Details Section -->
+    <section class="bg-black py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
+                
+                <!-- Cast & Crew -->
+                <div class="lg:col-span-2">
+                    {% if movie.actors.all %}
+                    <h2 class="text-2xl font-bold text-white mb-6">Cast</h2>
+                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-12">
+                        {% for actor in movie.actors.all|slice:":8" %}
+                        <div class="text-center">
+                            <img src="{% if actor.photo %}{{ actor.photo.url }}{% else %}https://via.placeholder.com/150x200/333/fff?text={{ actor.name|first }}{% endif %}" 
+                                 alt="{{ actor.name }}" 
+                                 class="w-full h-48 object-cover rounded-lg mb-2">
+                            <h3 class="text-white font-medium text-sm">{{ actor.name }}</h3>
+                            {% if actor.nationality %}
+                            <p class="text-gray-400 text-xs">{{ actor.nationality }}</p>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    
+                    {% if movie.directors.all %}
+                    <h2 class="text-2xl font-bold text-white mb-6">Directors</h2>
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                        {% for director in movie.directors.all %}
+                        <div class="flex items-center space-x-3">
+                            <img src="{% if director.photo %}{{ director.photo.url }}{% else %}https://via.placeholder.com/60x60/333/fff?text={{ director.name|first }}{% endif %}" 
+                                 alt="{{ director.name }}" 
+                                 class="w-12 h-12 object-cover rounded-full">
+                            <div>
+                                <h3 class="text-white font-medium">{{ director.name }}</h3>
+                                {% if director.nationality %}
+                                <p class="text-gray-400 text-sm">{{ director.nationality }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Movie Stats -->
+                <div>
+                    <div class="bg-gray-900 p-6 rounded-lg">
+                        <h3 class="text-xl font-bold text-white mb-4">Movie Details</h3>
+                        
+                        <div class="space-y-3 text-sm">
+                            <div class="flex justify-between">
+                                <span class="text-gray-400">Release Year:</span>
+                                <span class="text-white">{{ movie.release_year }}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-400">Duration:</span>
+                                <span class="text-white">{{ movie.duration_formatted }}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-400">Rating:</span>
+                                <span class="text-white">{{ movie.rating }}</span>
+                            </div>
+                            {% if movie.imdb_rating %}
+                            <div class="flex justify-between">
+                                <span class="text-gray-400">IMDB Rating:</span>
+                                <span class="text-white">{{ movie.imdb_rating }}/10</span>
+                            </div>
+                            {% endif %}
+                            <div class="flex justify-between">
+                                <span class="text-gray-400">Views:</span>
+                                <span class="text-white">{{ movie.view_count|floatformat:0 }}</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Available Qualities -->
+                        {% if movie.video_files.all %}
+                        <div class="mt-6">
+                            <h4 class="text-white font-medium mb-2">Available in:</h4>
+                            <div class="flex flex-wrap gap-2">
+                                {% for video in movie.video_files.all %}
+                                <span class="bg-green-600 text-white px-2 py-1 rounded text-xs">{{ video.quality }}</span>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Related Movies -->
+    {% if related_movies %}
+    <section class="bg-black py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-2xl font-bold text-white mb-8">More Like This</h2>
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                {% for related in related_movies %}
+                <div class="group cursor-pointer transform hover:scale-105 transition duration-300">
+                    <a href="{% url 'web:movie_detail' related.slug %}">
+                        <div class="relative">
+                            <img src="{% if related.thumbnail %}{{ related.thumbnail.url }}{% else %}https://via.placeholder.com/300x450/333/fff?text={{ related.title }}{% endif %}" 
+                                 alt="{{ related.title }}"
+                                 class="w-full h-64 object-cover rounded-lg shadow-lg">
+                            
+                            <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-60 transition duration-300 rounded-lg flex items-center justify-center">
+                                <div class="opacity-0 group-hover:opacity-100 transition duration-300 text-center">
+                                    <h3 class="text-white font-semibold text-sm">{{ related.title }}</h3>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+    {% endif %}
+</div>
+
+<!-- Trailer Modal -->
+{% if movie.trailer_url %}
+<div id="trailer-modal" class="fixed inset-0 bg-black bg-opacity-75 hidden z-50 flex items-center justify-center">
+    <div class="bg-black p-4 rounded-lg max-w-4xl w-full mx-4">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-white text-xl font-bold">{{ movie.title }} - Trailer</h3>
+            <button onclick="closeTrailer()" class="text-white hover:text-gray-300">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+        <div class="aspect-video">
+            <iframe id="trailer-iframe" 
+                    width="100%" 
+                    height="100%" 
+                    src="" 
+                    frameborder="0" 
+                    allowfullscreen>
+            </iframe>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Watchlist functionality
+function toggleWatchlist(movieId) {
+    {% if user.is_authenticated %}
+    fetch(`/api/toggle-watchlist/${movieId}/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken'),
+            'Content-Type': 'application/json',
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            const btn = document.getElementById('watchlist-btn');
+            const text = document.getElementById('watchlist-text');
+            const icon = btn.querySelector('svg');
+            
+            if (data.in_watchlist) {
+                text.textContent = 'Remove from List';
+                icon.setAttribute('fill', 'currentColor');
+            } else {
+                text.textContent = 'Add to List';
+                icon.setAttribute('fill', 'none');
+            }
+        }
+    })
+    .catch(error => console.error('Error:', error));
+    {% else %}
+    window.location.href = '/accounts/login/';
+    {% endif %}
+}
+
+// Trailer functionality
+{% if movie.trailer_url %}
+function openTrailer() {
+    const modal = document.getElementById('trailer-modal');
+    const iframe = document.getElementById('trailer-iframe');
+    
+    // Convert YouTube URL to embed URL
+    let trailerUrl = '{{ movie.trailer_url }}';
+    if (trailerUrl.includes('youtube.com/watch')) {
+        trailerUrl = trailerUrl.replace('watch?v=', 'embed/');
+    } else if (trailerUrl.includes('youtu.be/')) {
+        trailerUrl = trailerUrl.replace('youtu.be/', 'youtube.com/embed/');
+    }
+    
+    iframe.src = trailerUrl;
+    modal.classList.remove('hidden');
+}
+
+function closeTrailer() {
+    const modal = document.getElementById('trailer-modal');
+    const iframe = document.getElementById('trailer-iframe');
+    
+    iframe.src = '';
+    modal.classList.add('hidden');
+}
+
+// Close modal when clicking outside
+document.getElementById('trailer-modal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeTrailer();
+    }
+});
+{% endif %}
+
+// Get CSRF token
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+</script>
+{% endblock %}

@@ -1,0 +1,329 @@
+{% extends 'base.html' %}
+
+{% block title %}Netflix Clone - Watch Movies & TV Shows Online{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+{% if hero_movie %}
+<section class="relative h-screen flex items-center justify-start bg-cover bg-center bg-no-repeat" 
+         style="background-image: url('{% if hero_movie.banner_image %}{{ hero_movie.banner_image.url }}{% else %}{{ hero_movie.thumbnail.url }}{% endif %}');">
+    
+    <!-- Gradient Overlay -->
+    <div class="absolute inset-0 hero-gradient"></div>
+    
+    <!-- Hero Content -->
+    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="max-w-2xl">
+            <h1 class="text-4xl md:text-6xl font-bold text-white mb-4 animate-fade-in">
+                {{ hero_movie.title }}
+            </h1>
+            
+            <p class="text-lg md:text-xl text-gray-300 mb-6 line-clamp-3 animate-fade-in" style="animation-delay: 0.2s;">
+                {{ hero_movie.description }}
+            </p>
+            
+            <div class="flex items-center space-x-4 mb-8 animate-fade-in" style="animation-delay: 0.4s;">
+                <span class="bg-yellow-500 text-black px-2 py-1 rounded text-sm font-semibold">
+                    ⭐ {{ hero_movie.imdb_rating|default:"N/A" }}
+                </span>
+                <span class="text-gray-400">{{ hero_movie.release_year }}</span>
+                <span class="text-gray-400">{{ hero_movie.duration_formatted }}</span>
+                <span class="bg-gray-600 text-white px-2 py-1 rounded text-xs">{{ hero_movie.rating }}</span>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="flex items-center space-x-4 animate-fade-in" style="animation-delay: 0.6s;">
+                {% if user.is_authenticated %}
+                <a href="{% url 'web:watch_movie' hero_movie.slug %}" 
+                   class="bg-white text-black px-8 py-3 rounded font-semibold hover:bg-gray-200 transition flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path>
+                    </svg>
+                    Play
+                </a>
+                {% else %}
+                <a href="{% url 'account_login' %}" 
+                   class="bg-white text-black px-8 py-3 rounded font-semibold hover:bg-gray-200 transition flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path>
+                    </svg>
+                    Sign In to Watch
+                </a>
+                {% endif %}
+                
+                <a href="{% url 'web:movie_detail' hero_movie.slug %}" 
+                   class="bg-gray-600 bg-opacity-70 text-white px-8 py-3 rounded font-semibold hover:bg-opacity-90 transition flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    More Info
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Movie Rows -->
+<div class="bg-black py-12 space-y-12">
+    
+    {% if trending_movies %}
+    <!-- Trending Now -->
+    <section class="px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="text-2xl font-bold text-white mb-6">Trending Now</h2>
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                {% for movie in trending_movies %}
+                <div class="group cursor-pointer transform hover:scale-105 transition duration-300">
+                    <a href="{% url 'web:movie_detail' movie.slug %}">
+                        <div class="relative">
+                            <img src="{{ movie.thumbnail.url }}" 
+                                 alt="{{ movie.title }}"
+                                 class="w-full h-64 object-cover rounded-lg shadow-lg">
+                            
+                            <!-- Hover Overlay -->
+                            <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-60 transition duration-300 rounded-lg flex items-center justify-center">
+                                <div class="opacity-0 group-hover:opacity-100 transition duration-300 text-center">
+                                    <h3 class="text-white font-semibold text-sm mb-2">{{ movie.title }}</h3>
+                                    <div class="flex items-center justify-center space-x-2 text-xs text-gray-300">
+                                        <span>{{ movie.release_year }}</span>
+                                        <span>•</span>
+                                        <span>{{ movie.duration_formatted }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+    {% endif %}
+    
+    {% if new_releases %}
+    <!-- New Releases -->
+    <section class="px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="text-2xl font-bold text-white mb-6">New Releases</h2>
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                {% for movie in new_releases %}
+                <div class="group cursor-pointer transform hover:scale-105 transition duration-300">
+                    <a href="{% url 'web:movie_detail' movie.slug %}">
+                        <div class="relative">
+                            <img src="{{ movie.thumbnail.url }}" 
+                                 alt="{{ movie.title }}"
+                                 class="w-full h-64 object-cover rounded-lg shadow-lg">
+                            
+                            <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-60 transition duration-300 rounded-lg flex items-center justify-center">
+                                <div class="opacity-0 group-hover:opacity-100 transition duration-300 text-center">
+                                    <h3 class="text-white font-semibold text-sm mb-2">{{ movie.title }}</h3>
+                                    <div class="flex items-center justify-center space-x-2 text-xs text-gray-300">
+                                        <span>{{ movie.release_year }}</span>
+                                        <span>•</span>
+                                        <span>{{ movie.duration_formatted }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+    {% endif %}
+    
+    {% if action_movies %}
+    <!-- Action Movies -->
+    <section class="px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="text-2xl font-bold text-white mb-6">Action & Adventure</h2>
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                {% for movie in action_movies %}
+                <div class="group cursor-pointer transform hover:scale-105 transition duration-300">
+                    <a href="{% url 'web:movie_detail' movie.slug %}">
+                        <div class="relative">
+                            <img src="{{ movie.thumbnail.url }}" 
+                                 alt="{{ movie.title }}"
+                                 class="w-full h-64 object-cover rounded-lg shadow-lg">
+                            
+                            <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-60 transition duration-300 rounded-lg flex items-center justify-center">
+                                <div class="opacity-0 group-hover:opacity-100 transition duration-300 text-center">
+                                    <h3 class="text-white font-semibold text-sm mb-2">{{ movie.title }}</h3>
+                                    <div class="flex items-center justify-center space-x-2 text-xs text-gray-300">
+                                        <span>{{ movie.release_year }}</span>
+                                        <span>•</span>
+                                        <span>{{ movie.duration_formatted }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+    {% endif %}
+    
+    {% if comedy_movies %}
+    <!-- Comedy Movies -->
+    <section class="px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="text-2xl font-bold text-white mb-6">Comedy</h2>
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                {% for movie in comedy_movies %}
+                <div class="group cursor-pointer transform hover:scale-105 transition duration-300">
+                    <a href="{% url 'web:movie_detail' movie.slug %}">
+                        <div class="relative">
+                            <img src="{{ movie.thumbnail.url }}" 
+                                 alt="{{ movie.title }}"
+                                 class="w-full h-64 object-cover rounded-lg shadow-lg">
+                            
+                            <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-60 transition duration-300 rounded-lg flex items-center justify-center">
+                                <div class="opacity-0 group-hover:opacity-100 transition duration-300 text-center">
+                                    <h3 class="text-white font-semibold text-sm mb-2">{{ movie.title }}</h3>
+                                    <div class="flex items-center justify-center space-x-2 text-xs text-gray-300">
+                                        <span>{{ movie.release_year }}</span>
+                                        <span>•</span>
+                                        <span>{{ movie.duration_formatted }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+    {% endif %}
+    
+    {% if trending_tvshows %}
+    <!-- Trending TV Shows -->
+    <section class="px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="text-2xl font-bold text-white mb-6">Trending TV Shows</h2>
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                {% for tvshow in trending_tvshows %}
+                <div class="group cursor-pointer transform hover:scale-105 transition duration-300">
+                    <a href="{% url 'web:tvshow_detail' tvshow.slug %}">
+                        <div class="relative">
+                            <img src="{% if tvshow.thumbnail %}{{ tvshow.thumbnail.url }}{% else %}https://via.placeholder.com/300x450/333/fff?text={{ tvshow.title }}{% endif %}" 
+                                 alt="{{ tvshow.title }}"
+                                 class="w-full h-64 object-cover rounded-lg shadow-lg">
+                            
+                            <!-- Status Badge -->
+                            <div class="absolute top-2 left-2">
+                                <span class="bg-{% if tvshow.status == 'ongoing' %}green{% elif tvshow.status == 'ended' %}blue{% else %}red{% endif %}-600 text-white px-2 py-1 rounded text-xs uppercase font-semibold">
+                                    {{ tvshow.status }}
+                                </span>
+                            </div>
+                            
+                            <!-- Hover Overlay -->
+                            <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-60 transition duration-300 rounded-lg flex items-center justify-center">
+                                <div class="opacity-0 group-hover:opacity-100 transition duration-300 text-center">
+                                    <h3 class="text-white font-semibold text-sm mb-2">{{ tvshow.title }}</h3>
+                                    <div class="flex items-center justify-center space-x-2 text-xs text-gray-300">
+                                        <span>{{ tvshow.first_air_date.year }}</span>
+                                        <span>•</span>
+                                        <span>{{ tvshow.total_seasons }} Season{{ tvshow.total_seasons|pluralize }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+    {% endif %}
+    
+    {% if ongoing_tvshows %}
+    <!-- Ongoing TV Shows -->
+    <section class="px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="text-2xl font-bold text-white mb-6">Currently Airing</h2>
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                {% for tvshow in ongoing_tvshows %}
+                <div class="group cursor-pointer transform hover:scale-105 transition duration-300">
+                    <a href="{% url 'web:tvshow_detail' tvshow.slug %}">
+                        <div class="relative">
+                            <img src="{% if tvshow.thumbnail %}{{ tvshow.thumbnail.url }}{% else %}https://via.placeholder.com/300x450/333/fff?text={{ tvshow.title }}{% endif %}" 
+                                 alt="{{ tvshow.title }}"
+                                 class="w-full h-64 object-cover rounded-lg shadow-lg">
+                            
+                            <!-- Live Badge -->
+                            <div class="absolute top-2 left-2">
+                                <span class="bg-red-600 text-white px-2 py-1 rounded text-xs font-semibold animate-pulse">
+                                    LIVE
+                                </span>
+                            </div>
+                            
+                            <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-60 transition duration-300 rounded-lg flex items-center justify-center">
+                                <div class="opacity-0 group-hover:opacity-100 transition duration-300 text-center">
+                                    <h3 class="text-white font-semibold text-sm mb-2">{{ tvshow.title }}</h3>
+                                    <div class="flex items-center justify-center space-x-2 text-xs text-gray-300">
+                                        <span>{{ tvshow.first_air_date.year }}</span>
+                                        <span>•</span>
+                                        <span>{{ tvshow.total_seasons }} Season{{ tvshow.total_seasons|pluralize }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
+</div>
+
+<!-- Call to Action Section -->
+{% if not user.is_authenticated %}
+<section class="bg-netflix-gray py-16">
+    <div class="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
+        <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">
+            Ready to watch? Enter your email to create or restart your membership.
+        </h2>
+        <div class="flex flex-col sm:flex-row max-w-md mx-auto mt-8">
+            <input type="email" 
+                   placeholder="Email address" 
+                   class="flex-1 px-4 py-3 text-black rounded-l-md sm:rounded-r-none rounded-r-md focus:outline-none focus:ring-2 focus:ring-netflix-red">
+            <a href="{% url 'account_signup' %}" 
+               class="bg-netflix-red text-white px-8 py-3 rounded-r-md sm:rounded-l-none rounded-l-md hover:bg-red-700 transition font-semibold">
+                Get Started
+            </a>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Add scroll animations
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('animate-fade-in');
+            }
+        });
+    }, observerOptions);
+
+    // Observe all movie grid sections
+    document.querySelectorAll('section').forEach(section => {
+        observer.observe(section);
+    });
+</script>
+{% endblock %}

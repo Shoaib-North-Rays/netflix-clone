@@ -1,0 +1,752 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - Netflix Clone</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="auth-page">
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <div class="navbar-brand">
+                <a href="{% url 'web:home' %}">
+                    <img src="{% static 'images/logo.png' %}" alt="Netflix Clone" class="logo">
+                </a>
+            </div>
+            <div class="navbar-menu">
+                <a href="{% url 'login' %}" class="btn btn-secondary">Sign In</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="auth-main">
+        <div class="auth-container">
+            <div class="auth-card">
+                <div class="auth-header">
+                    <h1>Create your account</h1>
+                    <p>Join millions of members enjoying unlimited streaming</p>
+                </div>
+
+                <!-- Registration Steps -->
+                <div class="registration-steps">
+                    <div class="step active" data-step="1">
+                        <span class="step-number">1</span>
+                        <span class="step-label">Account</span>
+                    </div>
+                    <div class="step" data-step="2">
+                        <span class="step-number">2</span>
+                        <span class="step-label">Plan</span>
+                    </div>
+                    <div class="step" data-step="3">
+                        <span class="step-number">3</span>
+                        <span class="step-label">Payment</span>
+                    </div>
+                </div>
+
+                <!-- Form -->
+                <form method="post" class="auth-form" id="registrationForm">
+                    {% csrf_token %}
+                    
+                    <!-- Step 1: Account Details -->
+                    <div class="form-step active" id="step1">
+                        <div class="form-group">
+                            <label for="{{ form.username.id_for_label }}">Username</label>
+                            <input type="text" name="{{ form.username.name }}" id="{{ form.username.id_for_label }}" 
+                                   value="{{ form.username.value|default:'' }}" required>
+                            {% if form.username.errors %}
+                                <span class="error">{{ form.username.errors.0 }}</span>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-group">
+                            <label for="{{ form.email.id_for_label }}">Email address</label>
+                            <input type="email" name="{{ form.email.name }}" id="{{ form.email.id_for_label }}" 
+                                   value="{{ form.email.value|default:'' }}" required>
+                            {% if form.email.errors %}
+                                <span class="error">{{ form.email.errors.0 }}</span>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-group">
+                            <label for="{{ form.first_name.id_for_label }}">First Name</label>
+                            <input type="text" name="{{ form.first_name.name }}" id="{{ form.first_name.id_for_label }}" 
+                                   value="{{ form.first_name.value|default:'' }}" required>
+                            {% if form.first_name.errors %}
+                                <span class="error">{{ form.first_name.errors.0 }}</span>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-group">
+                            <label for="{{ form.last_name.id_for_label }}">Last Name</label>
+                            <input type="text" name="{{ form.last_name.name }}" id="{{ form.last_name.id_for_label }}" 
+                                   value="{{ form.last_name.value|default:'' }}" required>
+                            {% if form.last_name.errors %}
+                                <span class="error">{{ form.last_name.errors.0 }}</span>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-group">
+                            <label for="{{ form.password1.id_for_label }}">Password</label>
+                            <input type="password" name="{{ form.password1.name }}" id="{{ form.password1.id_for_label }}" required>
+                            {% if form.password1.errors %}
+                                <span class="error">{{ form.password1.errors.0 }}</span>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-group">
+                            <label for="{{ form.password2.id_for_label }}">Confirm Password</label>
+                            <input type="password" name="{{ form.password2.name }}" id="{{ form.password2.id_for_label }}" required>
+                            {% if form.password2.errors %}
+                                <span class="error">{{ form.password2.errors.0 }}</span>
+                            {% endif %}
+                        </div>
+
+                        <button type="button" class="btn btn-primary btn-next" onclick="nextStep()">
+                            Continue <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+
+                    <!-- Step 2: Plan Selection -->
+                    <div class="form-step" id="step2">
+                        <div class="plan-selection">
+                            <h3>Choose your plan</h3>
+                            <p>You can change or cancel your plan at any time.</p>
+                            
+                            <div class="plan-options">
+                                <div class="plan-option" data-plan="basic">
+                                    <input type="radio" name="selected_plan" value="basic" id="plan-basic">
+                                    <label for="plan-basic">
+                                        <div class="plan-info">
+                                            <h4>Basic</h4>
+                                            <p class="plan-price">$8.99/month</p>
+                                            <ul class="plan-features">
+                                                <li>Good video quality (720p)</li>
+                                                <li>Watch on 1 device at a time</li>
+                                                <li>Download on 1 device</li>
+                                            </ul>
+                                        </div>
+                                    </label>
+                                </div>
+
+                                <div class="plan-option recommended" data-plan="standard">
+                                    <div class="plan-badge">Recommended</div>
+                                    <input type="radio" name="selected_plan" value="standard" id="plan-standard" checked>
+                                    <label for="plan-standard">
+                                        <div class="plan-info">
+                                            <h4>Standard</h4>
+                                            <p class="plan-price">$13.99/month</p>
+                                            <ul class="plan-features">
+                                                <li>Better video quality (1080p)</li>
+                                                <li>Watch on 2 devices at a time</li>
+                                                <li>Download on 2 devices</li>
+                                            </ul>
+                                        </div>
+                                    </label>
+                                </div>
+
+                                <div class="plan-option" data-plan="premium">
+                                    <input type="radio" name="selected_plan" value="premium" id="plan-premium">
+                                    <label for="plan-premium">
+                                        <div class="plan-info">
+                                            <h4>Premium</h4>
+                                            <p class="plan-price">$17.99/month</p>
+                                            <ul class="plan-features">
+                                                <li>Best video quality (4K + HDR)</li>
+                                                <li>Watch on 4 devices at a time</li>
+                                                <li>Download on 6 devices</li>
+                                            </ul>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-secondary" onclick="prevStep()">
+                                <i class="fas fa-arrow-left"></i> Back
+                            </button>
+                            <button type="button" class="btn btn-primary btn-next" onclick="nextStep()">
+                                Continue <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Payment Information -->
+                    <div class="form-step" id="step3">
+                        <div class="payment-section">
+                            <h3>Set up your payment</h3>
+                            <p>Your membership starts immediately after payment.</p>
+                            
+                            <div class="selected-plan-summary">
+                                <h4>Selected Plan: <span id="selectedPlanName">Standard</span></h4>
+                                <p>Monthly price: <span id="selectedPlanPrice">$13.99</span></p>
+                            </div>
+
+                            <div class="payment-methods">
+                                <div class="payment-method active" data-method="card">
+                                    <i class="fas fa-credit-card"></i>
+                                    <span>Credit or Debit Card</span>
+                                </div>
+                            </div>
+
+                            <div class="card-form">
+                                <div class="form-group">
+                                    <label for="cardNumber">Card Number</label>
+                                    <input type="text" id="cardNumber" name="card_number" placeholder="1234 5678 9012 3456" maxlength="19" required>
+                                </div>
+
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="expiryDate">Expiry Date</label>
+                                        <input type="text" id="expiryDate" name="expiry_date" placeholder="MM/YY" maxlength="5" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="cvv">CVV</label>
+                                        <input type="text" id="cvv" name="cvv" placeholder="123" maxlength="4" required>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="cardName">Name on Card</label>
+                                    <input type="text" id="cardName" name="card_name" required>
+                                </div>
+                            </div>
+
+                            <div class="terms-agreement">
+                                <label class="checkbox-container">
+                                    <input type="checkbox" name="agree_terms" required>
+                                    <span class="checkmark"></span>
+                                    I agree to the <a href="#" target="_blank">Terms of Service</a> and <a href="#" target="_blank">Privacy Policy</a>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-secondary" onclick="prevStep()">
+                                <i class="fas fa-arrow-left"></i> Back
+                            </button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-lock"></i> Start Membership
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Error Messages -->
+                    {% if form.non_field_errors %}
+                        <div class="error-messages">
+                            {% for error in form.non_field_errors %}
+                                <div class="error">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </form>
+
+                <div class="auth-footer">
+                    <p>Already have an account? <a href="{% url 'login' %}">Sign in</a></p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        let currentStep = 1;
+        const totalSteps = 3;
+
+        // Handle URL parameters for pre-selected plan
+        const urlParams = new URLSearchParams(window.location.search);
+        const preSelectedPlan = urlParams.get('plan');
+        const preSelectedPrice = urlParams.get('price');
+
+        if (preSelectedPlan) {
+            document.querySelector(`input[value="${preSelectedPlan}"]`).checked = true;
+            updateSelectedPlan();
+        }
+
+        function nextStep() {
+            if (validateCurrentStep()) {
+                if (currentStep < totalSteps) {
+                    document.getElementById(`step${currentStep}`).classList.remove('active');
+                    document.querySelector(`.step[data-step="${currentStep}"]`).classList.remove('active');
+                    
+                    currentStep++;
+                    
+                    document.getElementById(`step${currentStep}`).classList.add('active');
+                    document.querySelector(`.step[data-step="${currentStep}"]`).classList.add('active');
+                    
+                    if (currentStep === 2) {
+                        updateSelectedPlan();
+                    }
+                }
+            }
+        }
+
+        function prevStep() {
+            if (currentStep > 1) {
+                document.getElementById(`step${currentStep}`).classList.remove('active');
+                document.querySelector(`.step[data-step="${currentStep}"]`).classList.remove('active');
+                
+                currentStep--;
+                
+                document.getElementById(`step${currentStep}`).classList.add('active');
+                document.querySelector(`.step[data-step="${currentStep}"]`).classList.add('active');
+            }
+        }
+
+        function validateCurrentStep() {
+            const currentStepElement = document.getElementById(`step${currentStep}`);
+            const requiredFields = currentStepElement.querySelectorAll('input[required]');
+            let isValid = true;
+
+            requiredFields.forEach(field => {
+                if (!field.value.trim()) {
+                    field.style.borderColor = '#E50914';
+                    isValid = false;
+                } else {
+                    field.style.borderColor = '#333';
+                }
+            });
+
+            if (currentStep === 1) {
+                const password1 = document.querySelector('input[name="password1"]').value;
+                const password2 = document.querySelector('input[name="password2"]').value;
+                
+                if (password1 !== password2) {
+                    document.querySelector('input[name="password2"]').style.borderColor = '#E50914';
+                    alert('Passwords do not match');
+                    isValid = false;
+                }
+            }
+
+            return isValid;
+        }
+
+        function updateSelectedPlan() {
+            const selectedPlan = document.querySelector('input[name="selected_plan"]:checked');
+            if (selectedPlan) {
+                const planName = selectedPlan.value;
+                const planPrices = {
+                    'basic': '$8.99',
+                    'standard': '$13.99',
+                    'premium': '$17.99'
+                };
+                
+                document.getElementById('selectedPlanName').textContent = planName.charAt(0).toUpperCase() + planName.slice(1);
+                document.getElementById('selectedPlanPrice').textContent = planPrices[planName];
+            }
+        }
+
+        // Plan selection handlers
+        document.querySelectorAll('.plan-option').forEach(option => {
+            option.addEventListener('click', function() {
+                const radio = this.querySelector('input[type="radio"]');
+                radio.checked = true;
+                
+                document.querySelectorAll('.plan-option').forEach(opt => opt.classList.remove('selected'));
+                this.classList.add('selected');
+                
+                updateSelectedPlan();
+            });
+        });
+
+        // Card number formatting
+        document.getElementById('cardNumber').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\s/g, '').replace(/[^0-9]/gi, '');
+            let formattedValue = value.match(/.{1,4}/g)?.join(' ') || value;
+            e.target.value = formattedValue;
+        });
+
+        // Expiry date formatting
+        document.getElementById('expiryDate').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length >= 2) {
+                value = value.substring(0, 2) + '/' + value.substring(2, 4);
+            }
+            e.target.value = value;
+        });
+
+        // CVV formatting
+        document.getElementById('cvv').addEventListener('input', function(e) {
+            e.target.value = e.target.value.replace(/\D/g, '');
+        });
+    </script>
+
+    <style>
+        .auth-page {
+            background: #000;
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+        }
+
+        .auth-main {
+            padding-top: 80px;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .auth-container {
+            width: 100%;
+            max-width: 500px;
+            padding: 0 20px;
+        }
+
+        .auth-card {
+            background: #1a1a1a;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .auth-header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .auth-header p {
+            color: #ccc;
+            font-size: 1.1rem;
+        }
+
+        .registration-steps {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 40px;
+        }
+
+        .step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0 20px;
+            opacity: 0.5;
+            transition: opacity 0.3s ease;
+        }
+
+        .step.active {
+            opacity: 1;
+        }
+
+        .step-number {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-bottom: 8px;
+            transition: background 0.3s ease;
+        }
+
+        .step.active .step-number {
+            background: #E50914;
+        }
+
+        .step-label {
+            font-size: 0.9rem;
+            color: #ccc;
+        }
+
+        .form-step {
+            display: none;
+        }
+
+        .form-step.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 15px;
+            border: 1px solid #333;
+            border-radius: 8px;
+            background: #2a2a2a;
+            color: #fff;
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #E50914;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        .plan-selection h3 {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+
+        .plan-selection p {
+            color: #ccc;
+            margin-bottom: 30px;
+        }
+
+        .plan-options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .plan-option {
+            position: relative;
+            border: 2px solid #333;
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            transition: border-color 0.3s ease;
+        }
+
+        .plan-option:hover,
+        .plan-option.selected {
+            border-color: #E50914;
+        }
+
+        .plan-option.recommended {
+            border-color: #E50914;
+        }
+
+        .plan-badge {
+            position: absolute;
+            top: -10px;
+            right: 20px;
+            background: #E50914;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .plan-option input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+        }
+
+        .plan-option label {
+            cursor: pointer;
+            display: block;
+        }
+
+        .plan-info h4 {
+            font-size: 1.3rem;
+            margin-bottom: 8px;
+        }
+
+        .plan-price {
+            color: #E50914;
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+        }
+
+        .plan-features {
+            list-style: none;
+            padding: 0;
+        }
+
+        .plan-features li {
+            color: #ccc;
+            margin-bottom: 5px;
+            font-size: 0.95rem;
+        }
+
+        .plan-features li::before {
+            content: '✓';
+            color: #E50914;
+            margin-right: 8px;
+        }
+
+        .selected-plan-summary {
+            background: #2a2a2a;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .selected-plan-summary h4 {
+            margin-bottom: 8px;
+        }
+
+        .selected-plan-summary p {
+            color: #ccc;
+            margin: 0;
+        }
+
+        .payment-methods {
+            margin-bottom: 30px;
+        }
+
+        .payment-method {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border: 2px solid #333;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: border-color 0.3s ease;
+        }
+
+        .payment-method.active {
+            border-color: #E50914;
+        }
+
+        .payment-method i {
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+
+        .terms-agreement {
+            margin-bottom: 30px;
+        }
+
+        .checkbox-container {
+            display: flex;
+            align-items: flex-start;
+            cursor: pointer;
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+
+        .checkbox-container input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .checkmark {
+            width: 20px;
+            height: 20px;
+            background: #333;
+            border-radius: 4px;
+            margin-right: 12px;
+            position: relative;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .checkbox-container input:checked ~ .checkmark {
+            background: #E50914;
+        }
+
+        .checkmark::after {
+            content: '';
+            position: absolute;
+            display: none;
+            left: 7px;
+            top: 3px;
+            width: 5px;
+            height: 10px;
+            border: solid white;
+            border-width: 0 3px 3px 0;
+            transform: rotate(45deg);
+        }
+
+        .checkbox-container input:checked ~ .checkmark::after {
+            display: block;
+        }
+
+        .checkbox-container a {
+            color: #E50914;
+            text-decoration: none;
+        }
+
+        .checkbox-container a:hover {
+            text-decoration: underline;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 30px;
+        }
+
+        .error {
+            color: #E50914;
+            font-size: 0.9rem;
+            margin-top: 5px;
+            display: block;
+        }
+
+        .error-messages {
+            margin-top: 20px;
+        }
+
+        .auth-footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 1px solid #333;
+        }
+
+        .auth-footer a {
+            color: #E50914;
+            text-decoration: none;
+        }
+
+        .auth-footer a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .auth-card {
+                padding: 20px;
+            }
+
+            .auth-header h1 {
+                font-size: 2rem;
+            }
+
+            .registration-steps {
+                margin-bottom: 30px;
+            }
+
+            .step {
+                margin: 0 10px;
+            }
+
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+        }
+    </style>
+</body>
+</html>

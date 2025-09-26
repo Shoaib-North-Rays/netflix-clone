@@ -1,0 +1,549 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete Your Subscription - Netflix Clone</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="subscription-page">
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <div class="navbar-brand">
+                <a href="{% url 'web:home' %}">
+                    <img src="{% static 'images/logo.png' %}" alt="Netflix Clone" class="logo">
+                </a>
+            </div>
+            <div class="navbar-menu">
+                <div class="user-menu">
+                    <span class="username">{{ user.get_full_name|default:user.username }}</span>
+                    <a href="{% url 'logout' %}" class="btn btn-secondary">Sign Out</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="subscription-main">
+        <div class="subscription-container">
+            <div class="subscription-header">
+                <h1>Complete Your Subscription</h1>
+                <p>You're just one step away from unlimited entertainment!</p>
+            </div>
+
+            <div class="subscription-content">
+                <!-- Plan Summary -->
+                <div class="plan-summary">
+                    <h2>Your Selected Plan</h2>
+                    <div class="plan-card selected">
+                        <div class="plan-info">
+                            <h3>{{ plan_info.name }} Plan</h3>
+                            <div class="plan-price">
+                                <span class="currency">$</span>
+                                <span class="amount">{{ plan_info.price }}</span>
+                                <span class="period">/month</span>
+                            </div>
+                            <div class="plan-features">
+                                <div class="feature">
+                                    <i class="fas fa-check"></i>
+                                    <span>{{ plan_info.quality }} video quality</span>
+                                </div>
+                                <div class="feature">
+                                    <i class="fas fa-check"></i>
+                                    <span>Watch on {{ plan_info.max_streams }} device{{ plan_info.max_streams|pluralize }} at once</span>
+                                </div>
+                                <div class="feature">
+                                    <i class="fas fa-check"></i>
+                                    <span>Unlimited movies and TV shows</span>
+                                </div>
+                                <div class="feature">
+                                    <i class="fas fa-check"></i>
+                                    <span>Cancel anytime</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="change-plan">
+                        <a href="{% url 'web:pricing' %}" class="change-plan-link">
+                            <i class="fas fa-edit"></i>
+                            Change Plan
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Payment Section -->
+                <div class="payment-section">
+                    <h2>Payment Information</h2>
+                    
+                    {% if messages %}
+                        <div class="messages">
+                            {% for message in messages %}
+                                <div class="alert alert-{{ message.tags }}">
+                                    {{ message }}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    
+                    <form method="post" class="payment-form" id="subscriptionForm">
+                        {% csrf_token %}
+                        
+                        <div class="payment-method">
+                            <div class="method-header">
+                                <i class="fas fa-credit-card"></i>
+                                <span>Credit or Debit Card</span>
+                            </div>
+                        </div>
+
+                        <div class="card-form">
+                            <div class="form-group">
+                                <label for="cardNumber">Card Number</label>
+                                <input type="text" id="cardNumber" name="card_number" 
+                                       placeholder="1234 5678 9012 3456" maxlength="19" required>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="expiryDate">Expiry Date</label>
+                                    <input type="text" id="expiryDate" name="expiry_date" 
+                                           placeholder="MM/YY" maxlength="5" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="cvv">CVV</label>
+                                    <input type="text" id="cvv" name="cvv" 
+                                           placeholder="123" maxlength="4" required>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="cardName">Name on Card</label>
+                                <input type="text" id="cardName" name="card_name" 
+                                       value="{{ user.get_full_name }}" required>
+                            </div>
+                        </div>
+
+                        <div class="billing-info">
+                            <h3>Billing Summary</h3>
+                            <div class="billing-row">
+                                <span>{{ plan_info.name }} Plan (Monthly)</span>
+                                <span>${{ plan_info.price }}</span>
+                            </div>
+                            <div class="billing-row total">
+                                <span>Total Due Today</span>
+                                <span>${{ plan_info.price }}</span>
+                            </div>
+                            <p class="billing-note">
+                                You will be charged ${{ plan_info.price }} monthly until you cancel. 
+                                You can cancel anytime in your account settings.
+                            </p>
+                        </div>
+
+                        <div class="terms-section">
+                            <label class="terms-checkbox">
+                                <input type="checkbox" name="agree_terms" required>
+                                <span class="checkmark"></span>
+                                I agree to the <a href="#" target="_blank">Terms of Service</a> and 
+                                <a href="#" target="_blank">Privacy Policy</a>
+                            </label>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-subscribe">
+                            <i class="fas fa-lock"></i>
+                            Start My Netflix Clone Membership
+                        </button>
+                    </form>
+
+                    <div class="security-info">
+                        <div class="security-item">
+                            <i class="fas fa-shield-alt"></i>
+                            <span>Your payment information is encrypted and secure</span>
+                        </div>
+                        <div class="security-item">
+                            <i class="fas fa-calendar-times"></i>
+                            <span>Cancel anytime, no questions asked</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Card number formatting
+        document.getElementById('cardNumber').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\s/g, '').replace(/[^0-9]/gi, '');
+            let formattedValue = value.match(/.{1,4}/g)?.join(' ') || value;
+            e.target.value = formattedValue;
+        });
+
+        // Expiry date formatting
+        document.getElementById('expiryDate').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length >= 2) {
+                value = value.substring(0, 2) + '/' + value.substring(2, 4);
+            }
+            e.target.value = value;
+        });
+
+        // CVV formatting
+        document.getElementById('cvv').addEventListener('input', function(e) {
+            e.target.value = e.target.value.replace(/\D/g, '');
+        });
+
+        // Form submission
+        document.getElementById('subscriptionForm').addEventListener('submit', function(e) {
+            const submitBtn = document.querySelector('.btn-subscribe');
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+            submitBtn.disabled = true;
+        });
+    </script>
+
+    <style>
+        .subscription-page {
+            background: #000;
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+        }
+
+        .subscription-main {
+            padding-top: 80px;
+            min-height: 100vh;
+        }
+
+        .subscription-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .subscription-header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .subscription-header h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .subscription-header p {
+            font-size: 1.3rem;
+            color: #ccc;
+        }
+
+        .subscription-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 50px;
+            align-items: start;
+        }
+
+        .plan-summary h2, .payment-section h2 {
+            font-size: 1.8rem;
+            margin-bottom: 25px;
+            color: #E50914;
+        }
+
+        .plan-card {
+            background: #1a1a1a;
+            border: 2px solid #E50914;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 20px;
+        }
+
+        .plan-info h3 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
+
+        .plan-price {
+            display: flex;
+            align-items: baseline;
+            margin-bottom: 25px;
+            gap: 3px;
+        }
+
+        .currency {
+            font-size: 1.2rem;
+            font-weight: 500;
+        }
+
+        .amount {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #E50914;
+        }
+
+        .period {
+            font-size: 1rem;
+            color: #ccc;
+        }
+
+        .plan-features {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .feature {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .feature i {
+            color: #E50914;
+            font-size: 1.1rem;
+        }
+
+        .change-plan {
+            text-align: center;
+        }
+
+        .change-plan-link {
+            color: #E50914;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .change-plan-link:hover {
+            color: #ff1e2b;
+        }
+
+        .messages {
+            margin-bottom: 25px;
+        }
+
+        .alert {
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .alert-success {
+            background: rgba(40, 167, 69, 0.2);
+            border: 1px solid rgba(40, 167, 69, 0.5);
+            color: #28a745;
+        }
+
+        .alert-error {
+            background: rgba(229, 9, 20, 0.2);
+            border: 1px solid rgba(229, 9, 20, 0.5);
+            color: #E50914;
+        }
+
+        .payment-method {
+            background: #2a2a2a;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border: 2px solid #E50914;
+        }
+
+        .method-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .method-header i {
+            color: #E50914;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 15px;
+            border: 1px solid #333;
+            border-radius: 8px;
+            background: #2a2a2a;
+            color: #fff;
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #E50914;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        .billing-info {
+            background: #2a2a2a;
+            border-radius: 8px;
+            padding: 25px;
+            margin: 30px 0;
+        }
+
+        .billing-info h3 {
+            margin-bottom: 20px;
+            color: #fff;
+        }
+
+        .billing-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #333;
+        }
+
+        .billing-row.total {
+            border-bottom: none;
+            border-top: 2px solid #E50914;
+            margin-top: 10px;
+            padding-top: 15px;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .billing-note {
+            margin-top: 15px;
+            font-size: 0.9rem;
+            color: #ccc;
+            line-height: 1.4;
+        }
+
+        .terms-section {
+            margin: 30px 0;
+        }
+
+        .terms-checkbox {
+            display: flex;
+            align-items: flex-start;
+            cursor: pointer;
+            line-height: 1.4;
+        }
+
+        .terms-checkbox input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .checkmark {
+            width: 20px;
+            height: 20px;
+            background: #333;
+            border-radius: 4px;
+            margin-right: 12px;
+            position: relative;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .terms-checkbox input:checked ~ .checkmark {
+            background: #E50914;
+        }
+
+        .checkmark::after {
+            content: '';
+            position: absolute;
+            display: none;
+            left: 7px;
+            top: 3px;
+            width: 5px;
+            height: 10px;
+            border: solid white;
+            border-width: 0 3px 3px 0;
+            transform: rotate(45deg);
+        }
+
+        .terms-checkbox input:checked ~ .checkmark::after {
+            display: block;
+        }
+
+        .terms-checkbox a {
+            color: #E50914;
+            text-decoration: none;
+        }
+
+        .terms-checkbox a:hover {
+            text-decoration: underline;
+        }
+
+        .btn-subscribe {
+            width: 100%;
+            padding: 18px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 30px;
+        }
+
+        .security-info {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .security-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #ccc;
+            font-size: 0.95rem;
+        }
+
+        .security-item i {
+            color: #28a745;
+        }
+
+        @media (max-width: 968px) {
+            .subscription-content {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .subscription-header h1 {
+                font-size: 2.2rem;
+            }
+
+            .subscription-container {
+                padding: 30px 15px;
+            }
+
+            .plan-card {
+                padding: 20px;
+            }
+
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+        }
+    </style>
+</body>
+</html>

@@ -1,0 +1,151 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage Subscription - Netflix Clone{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-black pt-20">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <h1 class="text-3xl font-bold text-white mb-8">Manage Your Subscription</h1>
+        
+        {% if subscriptions %}
+            {% for subscription in subscriptions %}
+            <div class="bg-gray-900 rounded-lg p-8 mb-6">
+                <div class="flex justify-between items-start mb-6">
+                    <div>
+                        <h2 class="text-2xl font-bold text-white mb-2">{{ subscription.subscription_plan.display_name }}</h2>
+                        <p class="text-gray-300">{{ subscription.subscription_plan.description }}</p>
+                    </div>
+                    <div class="text-right">
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium 
+                            {% if subscription.status == 'active' %}bg-green-100 text-green-800
+                            {% elif subscription.status == 'trialing' %}bg-blue-100 text-blue-800
+                            {% else %}bg-gray-100 text-gray-800{% endif %}">
+                            {{ subscription.get_status_display }}
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Subscription Details -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div class="bg-gray-800 rounded-lg p-4">
+                        <h3 class="text-lg font-semibold text-white mb-2">Monthly Price</h3>
+                        <p class="text-2xl font-bold text-netflix-red">${{ subscription.subscription_plan.price }}</p>
+                    </div>
+                    <div class="bg-gray-800 rounded-lg p-4">
+                        <h3 class="text-lg font-semibold text-white mb-2">Current Period</h3>
+                        <p class="text-gray-300">{{ subscription.current_period_start|date:"M j, Y" }} - {{ subscription.current_period_end|date:"M j, Y" }}</p>
+                    </div>
+                    <div class="bg-gray-800 rounded-lg p-4">
+                        <h3 class="text-lg font-semibold text-white mb-2">Next Billing</h3>
+                        <p class="text-gray-300">
+                            {% if subscription.cancel_at_period_end %}
+                                <span class="text-red-400">Canceling on {{ subscription.current_period_end|date:"M j, Y" }}</span>
+                            {% else %}
+                                {{ subscription.current_period_end|date:"M j, Y" }}
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Plan Features -->
+                <div class="mb-8">
+                    <h3 class="text-lg font-semibold text-white mb-4">Plan Features</h3>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div class="flex items-center">
+                            <svg class="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span class="text-gray-300 text-sm">{{ subscription.subscription_plan.max_streams }} Stream{{ subscription.subscription_plan.max_streams|pluralize }}</span>
+                        </div>
+                        {% if subscription.subscription_plan.hd_quality %}
+                        <div class="flex items-center">
+                            <svg class="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span class="text-gray-300 text-sm">HD Quality</span>
+                        </div>
+                        {% endif %}
+                        {% if subscription.subscription_plan.ultra_hd_quality %}
+                        <div class="flex items-center">
+                            <svg class="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span class="text-gray-300 text-sm">Ultra HD</span>
+                        </div>
+                        {% endif %}
+                        {% if subscription.subscription_plan.download_allowed %}
+                        <div class="flex items-center">
+                            <svg class="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span class="text-gray-300 text-sm">Downloads</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex flex-wrap gap-4">
+                    <a href="{% url 'users:customer_portal' %}" 
+                       class="inline-flex items-center bg-netflix-red text-white px-6 py-3 rounded font-semibold hover:bg-red-700 transition">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        </svg>
+                        Manage Billing
+                    </a>
+                    
+                    {% if not subscription.cancel_at_period_end %}
+                    <form method="post" action="{% url 'users:cancel_subscription' subscription.id %}" class="inline">
+                        {% csrf_token %}
+                        <button type="submit" 
+                                onclick="return confirm('Are you sure you want to cancel your subscription? You can continue using your account until {{ subscription.current_period_end|date:\'M j, Y\' }}.')"
+                                class="inline-flex items-center bg-gray-700 text-white px-6 py-3 rounded font-semibold hover:bg-gray-600 transition">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                            Cancel Subscription
+                        </button>
+                    </form>
+                    {% else %}
+                    <div class="inline-flex items-center bg-red-900 text-red-100 px-6 py-3 rounded font-semibold">
+                        <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                        </svg>
+                        Subscription Canceled
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+
+        {% else %}
+            <!-- No Active Subscriptions -->
+            <div class="text-center py-16">
+                <div class="mb-8">
+                    <svg class="w-16 h-16 mx-auto text-gray-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path>
+                    </svg>
+                    <h2 class="text-2xl font-bold text-white mb-4">No Active Subscriptions</h2>
+                    <p class="text-gray-300 mb-8">You don't have any active subscriptions. Choose a plan to start watching!</p>
+                    <a href="{% url 'web:pricing' %}" 
+                       class="inline-block bg-netflix-red text-white px-8 py-3 rounded font-semibold hover:bg-red-700 transition">
+                        View Plans
+                    </a>
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- Back to Profile -->
+        <div class="text-center mt-12">
+            <a href="{% url 'users:profile' %}" 
+               class="inline-flex items-center text-gray-400 hover:text-white transition">
+                <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                </svg>
+                Back to Profile
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

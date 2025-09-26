@@ -1,0 +1,182 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signed Out - Netflix Clone</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="auth-page">
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <div class="navbar-brand">
+                <a href="{% url 'web:home' %}">
+                    <img src="{% static 'images/logo.png' %}" alt="Netflix Clone" class="logo">
+                </a>
+            </div>
+            <div class="navbar-menu">
+                <a href="{% url 'login' %}" class="btn btn-secondary">Sign In</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="auth-main">
+        <div class="auth-container">
+            <div class="auth-card">
+                <div class="logout-content">
+                    <div class="logout-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <h1>You've been signed out</h1>
+                    <p>Thanks for watching! Come back soon.</p>
+                    
+                    <div class="logout-actions">
+                        <a href="{% url 'login' %}" class="btn btn-primary">
+                            Sign In Again
+                        </a>
+                        <a href="{% url 'web:home' %}" class="btn btn-secondary">
+                            Go to Homepage
+                        </a>
+                    </div>
+
+                    <div class="logout-info">
+                        <h3>While you're away...</h3>
+                        <ul>
+                            <li>Your watchlist and viewing history are saved</li>
+                            <li>We'll recommend new shows based on your preferences</li>
+                            <li>Your account remains secure</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <style>
+        .auth-page {
+            background: #000;
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+        }
+
+        .auth-main {
+            padding-top: 80px;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .auth-container {
+            width: 100%;
+            max-width: 500px;
+            padding: 0 20px;
+        }
+
+        .auth-card {
+            background: #1a1a1a;
+            border-radius: 12px;
+            padding: 50px;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .logout-content {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .logout-icon {
+            margin-bottom: 30px;
+        }
+
+        .logout-icon i {
+            font-size: 4rem;
+            color: #28a745;
+        }
+
+        .logout-content h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .logout-content p {
+            font-size: 1.2rem;
+            color: #ccc;
+            margin-bottom: 40px;
+        }
+
+        .logout-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 40px;
+        }
+
+        .logout-actions .btn {
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            border-radius: 8px;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+
+        .logout-info {
+            text-align: left;
+            background: #2a2a2a;
+            border-radius: 8px;
+            padding: 25px;
+        }
+
+        .logout-info h3 {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            color: #E50914;
+        }
+
+        .logout-info ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .logout-info li {
+            padding: 8px 0;
+            color: #ccc;
+            position: relative;
+            padding-left: 25px;
+        }
+
+        .logout-info li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #E50914;
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            .auth-card {
+                padding: 30px 25px;
+            }
+
+            .logout-content h1 {
+                font-size: 2rem;
+            }
+
+            .logout-actions {
+                gap: 12px;
+            }
+        }
+    </style>
+</body>
+</html>
